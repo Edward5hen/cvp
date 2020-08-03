@@ -47,7 +47,7 @@ pipeline {
           try {
             sh """
                cd /home/cloud-user/containers-ansible/containers-ansible
-               ansible-playbook ubi7-minimal.yml -e image_version=${img_fn}
+               ansible-playbook ubi7-minimal.yml -e image_fullname=${img_fn}
             """
           }
           catch (exc) {
