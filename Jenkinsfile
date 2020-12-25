@@ -48,7 +48,7 @@ pipeline {
 
           try {
             sh """
-                if [ ! -d containers-ansible ]
+                if [ ! -d zelda-backend ]
                 then
                   git clone git@gitlab.cee.redhat.com:atomic-qe/zelda-backend.git
                 fi
