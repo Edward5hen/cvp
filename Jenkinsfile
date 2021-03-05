@@ -81,7 +81,7 @@ pipeline {
             def brewNvr = buildMetadata['nvr']
             def brewName = buildMetadata['name']
             def product = buildMetadata['component']
-            namespace = "atomic-base-ubi8-container-test"
+            namespace = "atomic-" + brewName + "-container-test"
 
             def msgContent = """
              {
