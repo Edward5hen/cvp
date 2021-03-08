@@ -81,7 +81,7 @@ pipeline {
             def brewNvr = buildMetadata['nvr']
             def brewName = buildMetadata['name']
             def product = buildMetadata['component']
-            namespace = "atomic-rhel8-net-snmp-container-test"
+            namespace = "atomic-net-snmp-rhel8-container-test"
 
             def msgContent = """
              {
