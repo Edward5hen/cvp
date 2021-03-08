@@ -1,19 +1,12 @@
 /**
- * This file is to implement the CVP testing in the "extras" way.
- * Listening build UMB messages -> trigger the test job -> running test -> send results to zelda -> post test result via UMB message.
+ * This file is only used to manually send test results to resultsdb.
  */
 
-def ciMessage = params.CI_MESSAGE // UMB message which triggered the build
-def buildMetadata = [:]           // image build metadata; parsed from the UMB message
-def result_flag = 0               // flag for testing result, used for the post sending UMB
-def status = ''                   // testing result for post sending UMB
-def namespace = ''                // namespace for sending result
-
-
-// Load the contra-int-lib library which will be used for UMB message parsing
-library identifier: "contra-int-lib@master",
-        retriever: modernSCM([$class: 'GitSCMSource',
-                              remote: "https://gitlab.sat.engineering.redhat.com/contra/contra-int-lib.git"])
+def brewTaskID = params.BREW_ID
+def brewNvr = params.BREW_NVR
+def brewName = params.BREW_NAME
+def product = params.BREW_COMPONENT
+def namespace = params.TEST_CASE_NAME
 
 pipeline {
   agent {
@@ -23,42 +16,14 @@ pipeline {
   }
 
   stages {
-    stage("Parse 'redhat-container-image.pipeline.running' message") {
+    stage("Print warnings and send results") {
       steps {
         script {
-          echo "Raw message:\n${ciMessage}"
-
-          buildMetadata = extractCVPPipelineRunningMessageData(ciMessage)
-
-          def metadataStr = buildMetadata
-              .collect { meta -> "\t${meta.key} -> ${meta.value}"}
-              .join("\n")
-          echo "Build metadata:\n${metadataStr}"
-        }
-      }
-    }
-
-    stage("Run image tests") {
-      steps {
-        script {
-          echo "---------------------- TEST START ---------------------"
-
-          def img_fn = buildMetadata['full_name']
-          def test_nvr = buildMetadata['nvr']
-
-          try {
-            sh """
-                if [ ! -d zelda-backend ]
-                then
-                  git clone git@gitlab.cee.redhat.com:atomic-qe/zelda-backend.git
-                fi
-                cd zelda-backend/ansible-client
-                git pull
-                bash run_test.sh ${test_nvr} ${img_fn}
-            """
-          }
-          catch (exc) {
-            result_flag = 1
+          sh """
+            echo
+            echo "This job should not be used when automation works well."
+            echo
+          """
           }
         }
       }
@@ -71,17 +36,6 @@ pipeline {
             // the following three values need to match the configuration in gating.yaml
             def type = "default"
             def testName = "cvetest"
-            if (result_flag == 0) {
-              status = "PASSED"
-            } else {
-              status = "FAILED"
-            }
-
-            def brewTaskID = buildMetadata['id']
-            def brewNvr = buildMetadata['nvr']
-            def brewName = buildMetadata['name']
-            def product = buildMetadata['component']
-            namespace = "atomic-" + brewName + "-container-test"
 
             def msgContent = """
              {
