@@ -1,4 +1,1 @@
-#### Master branch is not used.
- 
-#### Different branches for different container images.
-> Eg,. `rhel7-rsyslog` represents `rhel7/rsyslog`
+#### Modify rhel8-rsyslog branch to work with zelda and jira bug
