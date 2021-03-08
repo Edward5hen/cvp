@@ -24,7 +24,6 @@ pipeline {
             echo "This job should not be used when automation works well."
             echo
           """
-          }
         }
       }
       post {
@@ -79,3 +78,4 @@ pipeline {
       }
     }
   }
+}
