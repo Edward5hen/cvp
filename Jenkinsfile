@@ -4,9 +4,9 @@
 
 def brewTaskID = params.BREW_ID
 def brewNvr = params.BREW_NVR
-def brewName = params.BREW_NAME
 def product = params.BREW_COMPONENT
 def namespace = params.TEST_CASE_NAME
+def status = params.TEST_STATUS
 
 pipeline {
   agent {
