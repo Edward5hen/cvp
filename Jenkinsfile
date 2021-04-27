@@ -4,6 +4,7 @@
  */
 
 def ciMessage = params.CI_MESSAGE // UMB message which triggered the build
+def testBranch = params.TEST_BRANCH // the branch for test project containers-ansible
 def buildMetadata = [:]           // image build metadata; parsed from the UMB message
 def result_flag = 0               // flag for testing result, used for the post sending UMB
 def status = ''                   // testing result for post sending UMB
@@ -54,7 +55,7 @@ pipeline {
                 fi
                 cd zelda-backend/ansible-client
                 git pull
-                bash run_test.sh ${test_nvr} ${img_fn}
+                bash run_test.sh ${test_nvr} ${img_fn} ${testBranch}
             """
           }
           catch (exc) {
