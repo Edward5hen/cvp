@@ -74,14 +74,70 @@ pipeline {
             if (result_flag == 0) {
               status = "PASSED"
             } else {
-              status = "FAILED"
+              status = "NEEDS_INSPECTION"
             }
 
             def brewTaskID = buildMetadata['id']
             def brewNvr = buildMetadata['nvr']
             def brewName = buildMetadata['name']
             def product = buildMetadata['component']
-            namespace = "atomic-" + brewName + "-container-test"
+            def middleStr = "empty"
+            if (brewName == "rhel7-etcd") {
+                middleStr = "etcd-rhel7"
+            }
+            if (brewName == "rhel7-flannel") {
+                middleStr = "flannel-rhel7"
+            }
+            if (brewName == "rhel7-rhel7-init") {
+                middleStr = "init-rhel7"
+            }
+            if (brewName == "rhel7-net-snmp") {
+                middleStr = "net-snmp-rhel7"
+            }
+            if (brewName == "rhel-open-vm-tools") {
+                middleStr = "open-vm-tools-rhel7"
+            }
+            if (brewName == "rhel7-rhel-tools") {
+                middleStr = "rhel-tools-rhel7"
+            }
+            if (brewName == "rhel7-rsyslog") {
+                middleStr = "rsyslog-rhel7"
+            }
+            if (brewName == "rhel7-sadc") {
+                middleStr = "sadc-rhel7"
+            }
+            if (brewName == "rhel7-support-tools") {
+                middleStr = "support-tools-rhel7"
+            }
+            if (brewName == "rhel8-net-snmp") {
+                middleStr = "net-snmp-rhel8"
+            }
+            if (brewName == "rhel8-rsyslog") {
+                middleStr = "rsyslog-rhel8"
+            }
+            if (brewName == "rhel8-support-tools") {
+                middleStr = "support-tools-rhel8"
+            }
+            if (brewName == "ubi7") {
+                middleStr = "ubi7"
+            }
+            if (brewName == "ubi7-ubi7-init") {
+                middleStr = "init-ubi7"
+            }
+            if (brewName == "ubi7-minimal") {
+                middleStr = "ubi7-minimal"
+            }
+            if (brewName == "ubi8") {
+                middleStr = "base-ubi8"
+            }
+            if (brewName == "ubi8-ubi8-init") {
+                middleStr = "init-ubi8"
+            }
+            if (brewName == "ubi8-minimal") {
+                middleStr = "minimal-ubi8"
+            }
+            assert middleStr != "empty"
+            namespace = "atomic-" + middleStr + "-container-test"
 
             def msgContent = """
              {
