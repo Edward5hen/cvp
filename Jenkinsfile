@@ -13,7 +13,7 @@ def namespace = ''                // namespace for sending result
 // Load the contra-int-lib library which will be used for UMB message parsing
 library identifier: "contra-int-lib@master",
         retriever: modernSCM([$class: 'GitSCMSource',
-                              remote: "https://gitlab.sat.engineering.redhat.com/contra/contra-int-lib.git"])
+                              remote: "https://gitlab.cee.redhat.com/cvp/contra-int-lib.git"])
 
 pipeline {
   agent {
