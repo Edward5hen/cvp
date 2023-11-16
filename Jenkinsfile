@@ -23,43 +23,26 @@ pipeline {
   }
 
   stages {
-    stage("Parse 'redhat-container-image.pipeline.running' message") {
-      steps {
-        script {
-          echo "Raw message:\n${ciMessage}"
+    //stage("Parse 'redhat-container-image.pipeline.running' message") {
+    //  steps {
+    //    script {
+    //      echo "Raw message:\n${ciMessage}"
 
-          buildMetadata = extractCVPPipelineRunningMessageData(ciMessage)
+    //      buildMetadata = extractCVPPipelineRunningMessageData(ciMessage)
 
-          def metadataStr = buildMetadata
-              .collect { meta -> "\t${meta.key} -> ${meta.value}"}
-              .join("\n")
-          echo "Build metadata:\n${metadataStr}"
-        }
-      }
-    }
+    //      def metadataStr = buildMetadata
+    //          .collect { meta -> "\t${meta.key} -> ${meta.value}"}
+    //          .join("\n")
+    //      echo "Build metadata:\n${metadataStr}"
+    //    }
+    //  }
+    //}
 
     stage("Run image tests") {
       steps {
         script {
-          echo "---------------------- TEST START ---------------------"
+          echo "just for test"
 
-          def img_fn = buildMetadata['full_name']
-          def test_nvr = buildMetadata['nvr']
-
-          try {
-            sh """
-                if [ ! -d zelda-backend ]
-                then
-                  git clone git@gitlab.cee.redhat.com:atomic-qe/zelda-backend.git
-                fi
-                cd zelda-backend/ansible-client
-                git pull
-                bash run_test.sh ${test_nvr} ${img_fn}
-            """
-          }
-          catch (exc) {
-            result_flag = 1
-          }
         }
       }
       post {
@@ -68,105 +51,48 @@ pipeline {
             // report test results to ResultsDB
             def provider = "Red Hat UMB" // change the provider to "Red Hat UMB Stage" for development purposes
 
-            // the following three values need to match the configuration in gating.yaml
-            def type = "default"
-            def testName = "cvetest"
-            if (result_flag == 0) {
-              status = "PASSED"
-            } else {
-              status = "NEEDS_INSPECTION"
-            }
-
-            def brewTaskID = buildMetadata['id']
-            def brewNvr = buildMetadata['nvr']
-            def brewName = buildMetadata['name']
-            def product = buildMetadata['component']
-            def middleStr = "empty"
-            if (brewName == "rhel7-etcd") {
-                middleStr = "etcd-rhel7"
-            }
-            if (brewName == "rhel7-flannel") {
-                middleStr = "flannel-rhel7"
-            }
-            if (brewName == "rhel7-rhel7-init") {
-                middleStr = "init-rhel7"
-            }
-            if (brewName == "rhel7-net-snmp") {
-                middleStr = "net-snmp-rhel7"
-            }
-            if (brewName == "rhel-open-vm-tools") {
-                middleStr = "open-vm-tools-rhel7"
-            }
-            if (brewName == "rhel7-rhel-tools") {
-                middleStr = "rhel-tools-rhel7"
-            }
-            if (brewName == "rhel7-rsyslog") {
-                middleStr = "rsyslog-rhel7"
-            }
-            if (brewName == "rhel7-sadc") {
-                middleStr = "sadc-rhel7"
-            }
-            if (brewName == "rhel7-support-tools") {
-                middleStr = "support-tools-rhel7"
-            }
-            if (brewName == "rhel8-net-snmp") {
-                middleStr = "net-snmp-rhel8"
-            }
-            if (brewName == "rhel8-rsyslog") {
-                middleStr = "rsyslog-rhel8"
-            }
-            if (brewName == "rhel8-support-tools") {
-                middleStr = "support-tools-rhel8"
-            }
-            if (brewName == "ubi7") {
-                middleStr = "ubi7"
-            }
-            if (brewName == "ubi7-ubi7-init") {
-                middleStr = "init-ubi7"
-            }
-            if (brewName == "ubi7-minimal") {
-                middleStr = "ubi7-minimal"
-            }
-            if (brewName == "ubi8") {
-                middleStr = "base-ubi8"
-            }
-            if (brewName == "ubi8-ubi8-init") {
-                middleStr = "init-ubi8"
-            }
-            if (brewName == "ubi8-minimal") {
-                middleStr = "minimal-ubi8"
-            }
-            assert middleStr != "empty"
-            namespace = "atomic-" + middleStr + "-container-test"
-
             def msgContent = """
              {
-                "category": "${testName}",
-                "status": "${status}",
-                "ci": {
-                    "url": "https://jenkins-cvp-ci.cloud.paas.upshift.redhat.com/",
-                    "team": "atomic-qe",
-                    "email": "weshen@redhat.com",
-                    "name": "Edward Shen"
+               "artifact": {
+                "component": "ubi8-minimal",
+                "full_names": [
+                "registry-proxy.engineering.redhat.com/rh-osbs/ubi8-minimal:8.8-787"
+                ],
+                "id": "sha256:76693708730539a59eab52dd707edb355aff0be0d55923598f4dceeb3e92db83",
+                "issuer": "odcs/odcs-backend05.hosts.prod.psi.bos.redhat.com",
+                "nvr": "ubi8-minimal-container-8.8-787",
+                "scratch": false,
+                "type": "redhat-container-image"
                 },
-                "run": {
-                    "url": "${BUILD_URL}",
-                    "log": "${BUILD_URL}/console"
-                },
-                "system": {
-                    "provider": "openshift",
-                    "os": "openshift"
-                },
-                "artifact": {
-                    "nvr": "${brewNvr}",
-                    "component": "${product}",
-                    "type": "brew-build",
-                    "id": "${brewTaskID}",
-                    "issuer": "Unknown issuer"
-                },
-                "type": "${type}",
-                "version": "0.1.0",
-                "namespace": "${namespace}"
+              "contact": {
+                "docs": "https://docs.engineering.redhat.com/display/CVP/Container+Verification+Pipeline+E2E+Documentation",
+                "email": "container-runtime-qe@redhat.com",
+                "name": "container-runtime-qe",
+                "team": "Container Runtime QE Team"
+              },
+              "generated_at": "2023-04-18T08:18:42.754308Z",
+              "pipeline": {
+                "id": "0e2db094-bc51-4998-82de-3ecdbc739f49",
+                "name": "crq-product-test"
+              },
+              "run": {
+                "log": "https://",
+                "url": "http://"
+              },
+              "system": [
+                {
+                  "architecture": "x86_64",
+                  "os": "rhel8.8",
+                  "provider": "beaker"
+                }
+              ],
+              "test": {
+                "category": "sanity",
+                "namespace": "crq.rhproduct",
+                "result": "passed",
+                "type": "default"
+              },
+              "version": "1.1.17"
               }"""
 
             echo "Sending the following message to UMB:\n${msgContent}"
@@ -174,7 +100,7 @@ pipeline {
             sendCIMessage(messageContent: msgContent,
                 messageProperties: '',
                 messageType: 'Custom',
-                overrides: [topic: "VirtualTopic.eng.ci.brew-build.test.complete"],
+                overrides: [topic: "VirtualTopic.eng.ci.crq.redhat-container-image.test.complete"],
                 providerName: provider)
           }
         }
