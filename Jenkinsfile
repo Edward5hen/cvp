@@ -100,7 +100,7 @@ pipeline {
             sendCIMessage(messageContent: msgContent,
                 messageProperties: '',
                 messageType: 'Custom',
-                overrides: [topic: "VirtualTopic.eng.ci.crq.redhat-container-image.test.complete"],
+                overrides: [topic: "VirtualTopic.eng.ci.container-runtime-cvp.redhat-container-image.test.complete"],
                 providerName: provider)
           }
         }
